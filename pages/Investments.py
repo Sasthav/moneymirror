@@ -98,8 +98,8 @@ def color_profit_loss(val):
     if val > 0:
         return "color: green"
     elif val < 0:
-        return "color: red"
-    else:
+        return "color: red"                                     
+    else:      
         return ""
 
 def showInvestments():
@@ -117,9 +117,9 @@ def showInvestments():
         combined_list = (df_units["Scheme Code"] + "--" + df_units["Scheme Name"]).unique().tolist()
         options = ["All"] + combined_list  
         option = st.selectbox("Choose scheme:", options)
-        parts = option.split('--')
+        parts = option.split('--')         
         scheme_name = parts[1] if len(parts) > 1 else "All"
-        scheme_code = parts[0] if len(parts) > 1 else "122639"
+        scheme_code = parts[0] if len(parts) > 1 else "122639"                                  
         #st.success(scheme_code)
         if scheme_name != "All":
          df_units = df_units[df_units['Scheme Name'] == scheme_name]
