@@ -70,8 +70,8 @@ schemes = {
 
 # --- Add new investment ---
 st.title("💰 Investment Entry Form")
-
-with st.form("investment_form"):
+def addInvestments():
+   with st.form("investment_form"):
     selected = st.selectbox(
         "Choose Scheme",
         options=[f"{code} - {name}" for code, name in schemes.items()]
@@ -86,30 +86,43 @@ with st.form("investment_form"):
         save_investment(scheme_code, scheme_name, amount, str(date_value))
         st.success(f"Saved {scheme_name} ({scheme_code}) with amount {amount}")
 
-# --- Display & manage investments ---
-st.subheader("📊 Saved Investments")
-rows = fetch_investments()
-if rows:
-    df = pd.DataFrame(rows, columns=["RowID", "Scheme Code", "Scheme Name", "Amount", "Date"])
-    st.dataframe(df, use_container_width=True)
+    # --- Display & manage investments ---
+    st.subheader("📊 Saved Investments")
+    rows = fetch_investments()
+    if rows:
+        df = pd.DataFrame(rows, columns=["RowID", "Scheme Code", "Scheme Name", "Amount", "Date"])
+        st.dataframe(df, use_container_width=True)
 
-    # Select a row to edit/delete
-    rowid = st.selectbox("Select investment to manage:", df["RowID"])
+        # Select a row to edit/delete
+        rowid = st.selectbox("Select investment to manage:", df["RowID"])
 
-    if rowid:
-        selected_row = df[df["RowID"] == rowid].iloc[0]
+        if rowid:
+            selected_row = df[df["RowID"] == rowid].iloc[0]
 
-        st.write(f"Editing: {selected_row['Scheme Name']} ({selected_row['Scheme Code']})")
+            st.write(f"Editing: {selected_row['Scheme Name']} ({selected_row['Scheme Code']})")
 
-        new_amount = st.number_input("Update Amount", value=float(selected_row["Amount"]))
-        new_date = st.date_input("Update Date", value=pd.to_datetime(selected_row["Date"]).date())
+            new_amount = st.number_input("Update Amount", value=float(selected_row["Amount"]))
+            new_date = st.date_input("Update Date", value=pd.to_datetime(selected_row["Date"]).date())
 
-        if st.button("Update Investment"):
-            update_investment(rowid, new_amount, str(new_date))
-            st.success("Investment updated successfully!")
+            if st.form_submit_button("Update Investment"):
+                update_investment(rowid, new_amount, str(new_date))
+                st.success("Investment updated successfully!")
 
-        if st.button("Delete Investment"):
-            delete_investment(rowid)
-            st.warning("Investment deleted successfully!")
+            if st.form_submit_button("Delete Investment"):
+                delete_investment(rowid)
+                st.warning("Investment deleted successfully!")
+    else:
+        st.info("No investments saved yet.")
+
+
+def home_screen():
+    st.title("Welcome to Mutual Fund Tracker")
+    st.write("Please log in to view your investments.")
+
+# --- Main app logic ---
+if "user_id" not in st.session_state or st.session_state["user_id"] is None:
+    # Redirect to home/login screen
+    home_screen()
 else:
-    st.info("No investments saved yet.")
+    # add investments only for logged-in user
+    addInvestments()
